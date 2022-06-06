@@ -4,6 +4,12 @@ import telegram
 
 from google.cloud import bigquery
 from operator import itemgetter as g
+from utils import build_query, get_coords
+
+TABLES = ['gee', 'worldclim', 'soilgrid']
+COORD_COLUMNS = ['lon_lower', 'lon_upper' , 'lat_lower' , 'lat_upper']
+
+client = bigquery.Client()
 
 def biodiversipy_bot(request):
     bot = telegram.Bot(token=os.environ["TELEGRAM_TOKEN"])
@@ -12,44 +18,26 @@ def biodiversipy_bot(request):
         update = telegram.Update.de_json(request.get_json(force=True), bot)
         chat_id = update.message.chat.id
 
-        client = bigquery.Client()
+        location = "TODO extract location from chat"
+        coords = get_coords(location)
 
-        search_lat = 52.476920
-        search_lon = 13.408188
+        queries = [
+            build_query(table, coords)
+            for table in TABLES]
 
-        QUERY_GEE = f'''
-        SELECT *
-        FROM `le-wagon-bootcamp-346910.features.gee` as gee
-        WHERE (gee.lat_lower <= {search_lat} AND gee.lat_upper > {search_lat} AND gee.lon_lower <= {search_lon} AND gee.lon_upper > {search_lon})
-        '''
+        df = pd.concat([
+            client\
+                .query(query)\
+                .to_dataframe()\
+                .drop(columns=COORD_COLUMNS)
+            for query in queries], axis=1)
 
-        QUERY_WORLDCLIM = f'''
-        SELECT *
-        FROM `le-wagon-bootcamp-346910.features.worldclim` as worldclim
-        WHERE (worldclim.lat_lower <= {search_lat} AND worldclim.lat_upper > {search_lat} AND worldclim.lon_lower <= {search_lon} AND worldclim.lon_upper > {search_lon})
-        '''
-
-        QUERY_SOILGRID = f'''
-        SELECT *
-        FROM `le-wagon-bootcamp-346910.features.soilgrid` as soilgrid
-        WHERE (soilgrid.lat_lower <= {search_lat} AND soilgrid.lat_upper > {search_lat} AND soilgrid.lon_lower <= {search_lon} AND soilgrid.lon_upper > {search_lon})
-        '''
-
-        coord_columns = ['lon_lower', 'lon_upper' , 'lat_lower' , 'lat_upper']
-
-        gee_df = client.query(QUERY_GEE).to_dataframe().drop(columns=coord_columns)
-        worldclim_df = client.query(QUERY_WORLDCLIM).to_dataframe().drop(columns=coord_columns)
-        soilgrid_df = client.query(QUERY_SOILGRID).to_dataframe().drop(columns=coord_columns)
-
-        df = pd.concat([gee_df, worldclim_df, soilgrid_df], axis=1)
-        df['latitude'] = search_lat
-        df['longitude'] = search_lon
+        df['latitude'], df['longitude'] = coords
 
         try:
             assert df.shape == (1, 84)
         except:
             return f"Wrong shape {df.shape}"
-
 
         bot.sendMessage(chat_id=chat_id, text=df.to_string())
 
