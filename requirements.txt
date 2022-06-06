@@ -1,0 +1,5 @@
+# bot
+python-telegram-bot==13.12
+
+# bigquery
+google-cloud-bigquery
