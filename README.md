@@ -5,7 +5,7 @@
 Create a gcloud function:
 
 ```sh
-gcloud functions deploy biodiversipy_bot --set-env-vars "TELEGRAM_TOKEN=<TELEGRAM_TOKEN>" --runtime python38 --trigger-http --project=le-wagon-bootcamp-346910
+gcloud functions deploy biodiversipy_bot --set-env-vars "TELEGRAM_TOKEN=<TELEGRAM_TOKEN>" --runtime python38 --trigger-http --project=le-wagon-bootcamp-346910 --region=<region>
 ```
 
 Set up webhook:
