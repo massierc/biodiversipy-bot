@@ -3,9 +3,9 @@ from utils import get_features
 
 
 class Predictor:
-    def __init__(self, location):
+    def __init__(self, coords):
         self.client = bigquery.Client()
-        self.features = get_features(location, self.client)
+        self.features = get_features(coords, self.client)
 
     def predict(self):
         self.predictions = [

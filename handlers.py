@@ -8,6 +8,10 @@ from telegram.ext import (
 )
 
 
+from predictor import Predictor
+from utils import get_coords
+
+
 def start(update: Update, context: CallbackContext):
     text = "\n\n".join(
         [f"Welcome to {context.bot.first_name}!", "Get started here 👉 /help"]
@@ -31,13 +35,28 @@ def find(update: Update, context: CallbackContext):
         update.message.reply_markdown("Please provide a location: /find `location`")
     else:
         location = " ".join([arg.capitalize() for arg in context.args])
-        update.message.reply_text(
-            f"Finding plants in {location}, this will take a few moments..."
+        coords, address = get_coords(location)
+        update.message.reply_markdown(
+            "\n\n".join(
+                [f"Finding plants in `{address}`", "This will take a few moments..."]
+            )
         )
+        predictor = Predictor(coords)
+        predictor.predict()
+
+        text = "\n\n".join(
+            [
+                "Good news, I found some plants!",
+                "Here are the results:",
+                predictor.predictions_text,
+            ]
+        )
+
+        update.message.reply_text(text)
 
 
 def unknown(update: Update, _):
-    text = "\n\n".join(["Sorry I didn't get it. I'm a simple bot 🙈", "Try /help"])
+    text = "\n\n".join(["Sorry, I didn't get it. I'm a simple bot 🙈", "Try /help"])
     update.message.reply_text(text)
 
 
