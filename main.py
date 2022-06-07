@@ -13,7 +13,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def biodiversipy_bot(request):
+def telegram_bot_v2(request):
     bot = Bot(os.environ["TELEGRAM_TOKEN"])
     update_queue = Queue()
     dispatcher = Dispatcher(bot, update_queue)

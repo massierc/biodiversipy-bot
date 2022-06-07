@@ -34,25 +34,26 @@ def find(update: Update, context: CallbackContext):
     if len(context.args) == 0:
         update.message.reply_markdown("Please provide a location: /find `location`")
     else:
+        message = update.message.reply_text("Got it! Just a minute.")
+
         location = " ".join([arg.capitalize() for arg in context.args])
         coords, address = get_coords(location)
-        update.message.reply_markdown(
-            "\n\n".join(
-                [f"Finding plants in `{address}`", "This will take a few moments..."]
-            )
-        )
+
+        message.edit_text(f"Finding plants in {address}")
+        message = update.message.reply_text("This will take a moment ⌛")
+
         predictor = Predictor(coords)
         predictor.predict()
 
         text = "\n\n".join(
             [
-                "Good news, I found some plants!",
+                "Good news, I found some plants! 🌱",
                 "Here are the results:",
                 predictor.predictions_text,
             ]
         )
 
-        update.message.reply_text(text)
+        message.edit_text(text)
 
 
 def unknown(update: Update, _):
