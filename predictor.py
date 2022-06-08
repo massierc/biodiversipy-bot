@@ -18,7 +18,7 @@ class Predictor:
         self.client = bigquery.Client()
         self.coords = coords
         self.features = get_features(coords, self.client)
-        logger.info(f"features for coords {coords}", self.features.to_json())
+        logger.info(f"features for coords {coords}", self.features)
 
     def predict(self):
         response = requests.get(MODEL_API_URL, params=self.features)
@@ -54,7 +54,7 @@ def execute_prediction(coords: str, update: Update) -> int:
             ]
         )
 
-        message.edit_text(text, reply_markup=ReplyKeyboardRemove())
+        message.edit_text(text)
         return ConversationHandler.END
     except Exception as e:
         logger.error(e)

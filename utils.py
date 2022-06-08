@@ -7,7 +7,7 @@ from typing import Tuple
 
 logger = logging.getLogger(__name__)
 
-TABLES = ["gee", "worldclim", "soilgrid"]
+TABLES = ["worldclim", "gee", "soilgrid"]
 COORD_COLUMNS = ["lon_lower", "lon_upper", "lat_lower", "lat_upper"]
 
 
@@ -50,14 +50,15 @@ def get_features(coords: Tuple[float, float], client: bigquery.Client):
         axis=1,
     )
 
-    features["latitude"], features["longitude"] = coords
+    features.insert(0, "latitude", coords[0])
+    features.insert(1, "longitude", coords[1])
 
     try:
         assert features.shape == (1, 84)
     except:
         return f"Wrong shape {features.shape}"
 
-    return features
+    return features.to_dict("records")[0]
 
 
 def args_to_location(args):
