@@ -1,4 +1,6 @@
 import logging
+import os
+import requests
 
 from google.cloud import bigquery
 from utils import get_features
@@ -8,6 +10,7 @@ from telegram import Update, ReplyKeyboardRemove
 
 
 logger = logging.getLogger(__name__)
+MODEL_API_URL = os.environ["MODEL_API_URL"]
 
 
 class Predictor:
@@ -16,13 +19,13 @@ class Predictor:
         self.features = get_features(coords, self.client)
 
     def predict(self):
-        self.predictions = [
-            ("Some species", 0.23),
-            ("Some other species", 0.15),
-            ("A third species", 0.04),
-        ]
+        response = requests.get(MODEL_API_URL, params=self.features)
+        self.predictions = response.json()["species"]
         self.predictions_text = "\n".join(
-            [f"{species[0]} - {species[1]:.2%}" for species in self.predictions]
+            [
+                f"{species['species']} - {species['probability']:.2%}"
+                for species in self.predictions
+            ]
         )
 
 
