@@ -1,5 +1,13 @@
+import logging
+
 from google.cloud import bigquery
 from utils import get_features
+
+from telegram.ext import ConversationHandler
+from telegram import Update
+
+
+logger = logging.getLogger(__name__)
 
 
 class Predictor:
@@ -16,3 +24,26 @@ class Predictor:
         self.predictions_text = "\n".join(
             [f"{species[0]} - {species[1]:.2%}" for species in self.predictions]
         )
+
+
+def execute_prediction(coords: str, update: Update) -> int:
+    message = update.message.reply_text("Got it! Just a minute ⌛")
+
+    try:
+        predictor = Predictor(coords)
+        predictor.predict()
+
+        text = "\n\n".join(
+            [
+                "Good news, I found some plants! 🌱",
+                "Here are the results:",
+                predictor.predictions_text,
+            ]
+        )
+
+        message.edit_text(text)
+        return ConversationHandler.END
+    except Exception as e:
+        logger.error(e)
+        message.edit_text("An error occurred during the prediction, please try again.")
+        return ConversationHandler.END
