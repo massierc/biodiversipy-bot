@@ -8,5 +8,5 @@ deploy:
 		--runtime=python38 \
 		--region=europe-west1
 
-poll:
+start_polling:
 	@python main.py

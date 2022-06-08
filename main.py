@@ -28,10 +28,10 @@ def telegram_bot_v2(request):
 
 
 def main():
-    bot = Bot(os.environ["TELEGRAM_TOKEN"])
-    updater = Updater(bot=bot, use_context=True)
+    updater = Updater(os.environ["TELEGRAM_TOKEN"], use_context=True)
     register_handlers(updater.dispatcher)
     updater.start_polling()
+    updater.idle()
 
 
 if __name__ == "__main__":

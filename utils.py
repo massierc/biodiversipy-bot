@@ -22,11 +22,17 @@ def build_query(table, coords):
         """
 
 
-def get_coords(raw_location):
+def get_coords(raw_location, update=None):
     logger.info(f"Looking for coordinates for {raw_location}")
 
     geolocator = Nominatim(user_agent="biodiversipy_bot")
     location = geolocator.geocode(raw_location)
+
+    if not location:
+        if update:
+            update.message.reply_text(f"Sorry, I couldn't find {raw_location} 😖")
+        return None, None
+
     coords = (location.latitude, location.longitude)
     address = location.address
 
@@ -54,3 +60,7 @@ def get_features(coords: Tuple[float, float], client: bigquery.Client):
         return f"Wrong shape {features.shape}"
 
     return features
+
+
+def args_to_location(args):
+    return " ".join([arg.capitalize() for arg in args])
