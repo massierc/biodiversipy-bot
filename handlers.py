@@ -33,8 +33,8 @@ def about(update: Update, context: CallbackContext):
     text = "\n".join(
         [
             f"🔍 {context.bot.first_name} is an AI tool developed for educational and demonstration purposes only.\n",
-            "🗺️ <b>Input</b>: a location in Germany",
-            "🌿 <b>Output</b>: the 5 plant species most likely present.\n",
+            "🗺️ <code>Input  </code> A location in Germany",
+            "🌿 <code>Output </code> The 5 plant species most likely present at that location\n",
             "The model was trained using about 2 million observations in Germany. It makes predictions using environmental features retrieved from open-access databases:\n",
             "⛅️ Bioclimatic data, like temperature and precipitations",
             "🪨 Soil properties, like pH and CEC",
