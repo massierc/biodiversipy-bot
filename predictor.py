@@ -4,7 +4,7 @@ from google.cloud import bigquery
 from utils import get_features
 
 from telegram.ext import ConversationHandler
-from telegram import Update
+from telegram import Update, ReplyKeyboardRemove
 
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,12 @@ class Predictor:
 def execute_prediction(coords: str, update: Update) -> int:
     message = update.message.reply_text("Got it! Just a minute ⌛")
 
+    if not coords:
+        message.edit_text(
+            f"😖 Could not find {update.message.text}. Try with something else!",
+        )
+        return ConversationHandler.END
+
     try:
         predictor = Predictor(coords)
         predictor.predict()
@@ -41,9 +47,11 @@ def execute_prediction(coords: str, update: Update) -> int:
             ]
         )
 
-        message.edit_text(text)
+        message.edit_text(text, reply_markup=ReplyKeyboardRemove())
         return ConversationHandler.END
     except Exception as e:
         logger.error(e)
-        message.edit_text("An error occurred during the prediction, please try again.")
+        message.edit_text(
+            "An error occurred during the prediction, please try again.",
+        )
         return ConversationHandler.END

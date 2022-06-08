@@ -29,16 +29,14 @@ def get_coords(raw_location, update=None):
     location = geolocator.geocode(raw_location)
 
     if not location:
-        if update:
-            update.message.reply_text(f"Sorry, I couldn't find {raw_location} 😖")
-        return None, None
+        return None
 
     coords = (location.latitude, location.longitude)
     address = location.address
 
     logger.info(f"ADDRESS: {address} - LAT, LON: {coords}")
 
-    return coords, address
+    return coords
 
 
 def get_features(coords: Tuple[float, float], client: bigquery.Client):

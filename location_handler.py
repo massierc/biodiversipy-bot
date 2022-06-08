@@ -46,7 +46,9 @@ def location_prompt(update: Update, _) -> int:
 
         return LOCATION_FROM_TEXT
     else:
-        update.message.reply_text("Sorry I didn't get that.")
+        update.message.reply_text(
+            "Sorry I didn't get that.", reply_markup=ReplyKeyboardRemove()
+        )
 
     return ConversationHandler.END
 
@@ -70,11 +72,18 @@ def text_location(update: Update, _):
     return execute_prediction(coords, update)
 
 
-def cancel(update: Update) -> int:
-    """Cancels and ends the conversation."""
-    user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
-    update.message.reply_text("See you!", reply_markup=ReplyKeyboardRemove())
+def stop(update: Update, _) -> int:
+    update.message.reply_text(
+        "Alright, till next time! 👋", reply_markup=ReplyKeyboardRemove()
+    )
+
+    return ConversationHandler.END
+
+
+def fallback(update: Update, _) -> int:
+    update.message.reply_text(
+        "I didn't get that. Try again 👉 /find", reply_markup=ReplyKeyboardRemove()
+    )
 
     return ConversationHandler.END
 
@@ -90,7 +99,7 @@ location_handler = ConversationHandler(
         ],
         LOCATION_FROM_MAP: [
             MessageHandler(
-                Filters.location,
+                (Filters.location | Filters.text) & (~Filters.regex(f"^(?i)stop$")),
                 map_location,
             )
         ],
@@ -101,5 +110,11 @@ location_handler = ConversationHandler(
             )
         ],
     },
-    fallbacks=[CommandHandler("cancel", cancel)],
+    fallbacks=[
+        MessageHandler(Filters.regex(f"^(?i)stop$"), stop),
+        MessageHandler(
+            Filters.command,
+            fallback,
+        ),
+    ],
 )
