@@ -16,11 +16,15 @@ MODEL_API_URL = os.environ["MODEL_API_URL"]
 class Predictor:
     def __init__(self, coords):
         self.client = bigquery.Client()
+        self.coords = coords
         self.features = get_features(coords, self.client)
+        logger.info(f"features for coords {coords}", self.features.to_json())
 
     def predict(self):
         response = requests.get(MODEL_API_URL, params=self.features)
-        self.predictions = response.json()["species"]
+        json = response.json()
+        logger.info(f"predictions for coords {self.coords}", json)
+        self.predictions = json["species"]
         self.predictions_text = "\n".join(
             [
                 f"{species['species']} - {species['probability']:.2%}"
