@@ -33,7 +33,26 @@ def help(update: Update, _):
     text = "\n\n".join(
         [
             "The following commands are available:",
-            "📍 /find `location` • Returns the probability of finding a species at the specified location",
+            "📍 /find `location` • Returns 5 plant species most likely present at the specified location",
+            "❓ /about • About PlantsNearMe",
+            "🙋‍♀️ /help • Come back here",
+        ]
+    )
+    update.message.reply_markdown(text)
+
+def about(update: Update, _):
+    text = "\n\n".join(
+        [
+            "🔍 • PlantsNearMe is an AI tool developed for educational and demonstration purposes only.",
+            "🗺️ • Input: a location in Germany",
+            "🌳🌲🌼🌿🌴 • Output: the 5 plant species most likely present.",
+            "🛰️ • The model makes predictions using environmental features retrieved from open-access databases:",
+            "-- ☀️ bioclimatic data, like temperature and precipitations",
+            "-- [X] soil properties, like pH and CEC",
+            "-- ⛰️ topographic data, like elevation",
+            "The model was trained using about 2 million observations in Germany."
+            "Source code, data sources, licenses and disclaimers: see https://github.com/TmtStss/biodiversipy",
+            "📍 /find `location` • Try it out !",
             "🙋‍♀️ /help • Come back here",
         ]
     )
