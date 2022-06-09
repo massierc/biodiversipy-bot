@@ -85,10 +85,10 @@ def get_species_description(scientific_name):
     query = scientific_name.replace(" ", "_")
     html = requests.get(f"https://en.wikipedia.org/wiki/{query}")
     soup = BeautifulSoup(html.text, "html.parser")
-    string = " ".join(soup.select("p")[1].find_all(text=True)).strip("\n")
-    description = re.sub("\[\d+\]", "", string)
+    raw_text = "".join(soup.select("p")[1].find_all(text=True))
+    text = re.sub("\[\d+\]", "", raw_text)
 
-    return description
+    return text
 
 
 def get_species_img(scientific_name):
