@@ -34,9 +34,9 @@ def about(update: Update, context: CallbackContext):
             "🗺️ <code>Input  </code> A location in Germany",
             "🌿 <code>Output </code> The 5 plant species most likely present at that location\n",
             "The model was trained using about 2 million observations in Germany. It makes predictions using environmental features retrieved from open-access databases:\n",
-            "⛅️ Bioclimatic data, like temperature and precipitations",
-            "🪨 Soil properties, like pH and CEC",
-            "⛰️ Topographic data, like elevation\n",
+            "⛅️ Bioclimatic data, such as temperature and precipitation",
+            "🪨 Soil properties, such as pH and CEC",
+            "⛰️ Topographic data, such as elevation\n",
             "<i>Source code, data sources, licenses and disclaimers on https://github.com/TmtStss/biodiversipy</i>",
         ]
     )
@@ -57,12 +57,13 @@ def sup(update: Update, _):
         "Bring it on 💪",
         "Yo 🤙",
     ]
-    update.message.reply_text(random.choice(replies))
+    text = "\n\n".join([random.choice(replies), "Are you looking for /find ?"])
+    update.message.reply_text(text)
 
 
 def unknown(update: Update, _):
     text = "\n\n".join(
-        ["Sorry, I didn't get it. I'm a simple bot 🙈", "Check my commands below 👇"]
+        ["Sorry, I didn't get it. I'm a simple bot 🙈", "Are you looking for 👉 /find ?"]
     )
     update.message.reply_text(text)
 

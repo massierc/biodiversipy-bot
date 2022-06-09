@@ -92,14 +92,13 @@ def get_species_description(scientific_name):
 
 
 def get_species_img(scientific_name):
-    params = {
-        "q": scientific_name,
-        "tbm": "isch",
-        "content-type": "image/jpeg",
-        "size": "large",
-    }
-    html = requests.get("https://www.google.com/search", params=params)
+    query = scientific_name.replace(" ", "_")
+    html = requests.get(f"https://en.wikipedia.org/wiki/{query}")
     soup = BeautifulSoup(html.text, "html.parser")
-    url = soup.select("img")[2]["src"]
+    url_bit = soup.select("img")[0].get("srcset").split(",")[1][:-2].strip()
+    full_url = "https:" + url_bit
 
-    return url
+    return full_url
+
+
+print(get_species_img("Glechoma hederacea"))

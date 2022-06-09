@@ -58,9 +58,10 @@ def execute_prediction(coords: str, update: Update) -> int:
         if desc:
             update.message.reply_html(f"<i>{desc}</i>")
 
-        update.message.reply_text(
-            f"\n\Other plants you are likely to encounter:\n\n{'\n'.join(species[1:])}"
+        text = "\n\n".join(
+            [f"Other plants you are likely to encounter:", "\n".join(species[1:])]
         )
+        update.message.reply_text(text)
 
     except Exception as e:
         logger.error(e)
