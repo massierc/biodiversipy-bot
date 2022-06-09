@@ -91,7 +91,7 @@ def get_species_description(scientific_name):
     return description
 
 
-def get_plant_img(scientific_name):
+def get_species_img(scientific_name):
     params = {
         "q": scientific_name,
         "tbm": "isch",

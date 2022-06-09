@@ -3,7 +3,7 @@ import os
 import requests
 
 from google.cloud import bigquery
-from utils import get_features
+from utils import get_features, get_species_img, get_species_description
 
 from telegram.ext import ConversationHandler
 from telegram import Update
@@ -25,36 +25,49 @@ class Predictor:
         json = response.json()
         logger.info(f"predictions for coords {self.coords}", json)
         self.predictions = json["species"]
-        self.predictions_text = "\n".join(
-            [
-                f"{species['species']} - {species['probability']:.2%}"
-                for species in self.predictions
-            ]
-        )
+
+        return self.predictions
 
 
 def execute_prediction(coords: str, update: Update) -> int:
     message = update.message.reply_text("Got it! Just a minute ⌛")
 
-    if not coords:
-        message.edit_text(
-            f"😖 Could not find {update.message.text}. Try with something else!",
-        )
-        return ConversationHandler.END
-
     try:
-        predictor = Predictor(coords)
-        predictor.predict()
+        # predictor = Predictor(coords)
+        # predictions = predictor.predict()
 
-        text = "\n\n".join(
-            [
-                "Good news, I found some plants! 🌱",
-                "Here are the results:",
-                predictor.predictions_text,
-            ]
+        predictions = [
+            {"species": "Chelidonium majus"},
+            {"species": "Hedera helix"},
+            {"species": "Echium vulgare"},
+            {"species": "Bellis perennis"},
+            {"species": "Glechoma hederacea"},
+        ]
+
+        species = [prediction["species"] for prediction in predictions]
+
+        most_likely = species[0]
+        other_species = "\n".join(
+            [f"{i + 2}. {sp}" for i, sp in enumerate(species[1:])]
         )
 
-        message.edit_text(text)
+        message.edit_text(f"Good news, I found some plants! 🌱")
+        update.message.reply_html(
+            f"The plant you will most likely find here is <b>{species[0]}</b>:"
+        )
+
+        img = get_species_img(most_likely)
+        if img:
+            update.message.reply_photo(img)
+
+        desc = get_species_description(most_likely)
+        if desc:
+            update.message.reply_html(f"<i>{desc}</i>")
+
+        update.message.reply_text(
+            f"\n\nThe next most likely plants here are:\n\n{other_species}"
+        )
+
         return ConversationHandler.END
     except Exception as e:
         logger.error(e)

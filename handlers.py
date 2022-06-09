@@ -1,7 +1,7 @@
 import logging
 import random
 
-from telegram import Update
+from telegram import Update, ReplyKeyboardRemove
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
@@ -75,6 +75,10 @@ def error_handler(update: Update, context: CallbackContext):
     return ConversationHandler.END
 
 
+def remove_keyboard(update: Update, _):
+    update.message.reply_text("Done!", reply_markup=ReplyKeyboardRemove())
+
+
 command_handlers = [
     ("start", start),
     ("about", about),
@@ -82,8 +86,9 @@ command_handlers = [
 ]
 
 message_handlers = [
-    ("sup", sup, Filters.regex(f"^(?i)(yo|sup|hey|hi|hello|what's up|what up).*$")),
-    ("unknown", unknown, Filters.text & (~Filters.command)),
+    (sup, Filters.regex(f"^(?i)(yo|sup|hey|hi|hello|what's up|what up|whatsup).*$")),
+    (remove_keyboard, Filters.regex(f"^(?i)(remove keyboard|rmkb)$")),
+    (unknown, Filters.text & (~Filters.command)),
 ]
 
 
@@ -93,7 +98,7 @@ def register_handlers(dispatcher: Dispatcher):
 
     dispatcher.add_handler(location_handler)
 
-    for (id, fn, filters) in message_handlers:
+    for (fn, filters) in message_handlers:
         dispatcher.add_handler(MessageHandler(filters, fn))
 
     dispatcher.add_error_handler(error_handler)
