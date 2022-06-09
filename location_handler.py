@@ -21,10 +21,11 @@ LOCATION_KEYBOARD = ["Choose on map", "Send via text"]
 
 def find(update: Update, context: CallbackContext) -> int:
     if len(context.args) == 0:
-        text = "\n\n".join(
+        text = "\n".join(
             [
-                "Send me a location 📍",
-                "Or just type an address ✍️",
+                "Alright let's go!\n",
+                "Please share your location from the menu button below 📎",
+                "Alternatively, just type an address ✍️",
             ]
         )
         update.message.reply_text(text)
