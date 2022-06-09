@@ -12,11 +12,13 @@ from telegram.ext import (
 )
 
 from location_handler import location_handler
+from utils import log_update
 
 logger = logging.getLogger(__name__)
 
 
 def start(update: Update, context: CallbackContext):
+    log_update(update, logger)
     text = "\n\n".join(
         [
             f"Welcome to {context.bot.first_name}!",
@@ -28,6 +30,7 @@ def start(update: Update, context: CallbackContext):
 
 
 def about(update: Update, context: CallbackContext):
+    log_update(update, logger)
     text = "\n".join(
         [
             f"🔍 {context.bot.first_name} is an AI tool developed for educational and demonstration purposes only.\n",
@@ -43,12 +46,14 @@ def about(update: Update, context: CallbackContext):
     update.message.reply_html(text, disable_web_page_preview=True)
 
 
-def bad_command(_: Update, context: CallbackContext):
+def bad_command(update: Update, context: CallbackContext):
     """Raise an error to trigger the error handler."""
+    log_update(update, logger)
     context.bot.wrong_method_name()
 
 
 def sup(update: Update, _):
+    log_update(update, logger)
     replies = [
         "Molto bene 🤌",
         "Peace ✌️",
@@ -62,6 +67,7 @@ def sup(update: Update, _):
 
 
 def unknown(update: Update, _):
+    log_update(update, logger)
     text = "\n\n".join(
         ["Sorry, I didn't get it. I'm a simple bot 🙈", "Are you looking for 👉 /find ?"]
     )
@@ -77,6 +83,7 @@ def error_handler(update: Update, context: CallbackContext):
 
 
 def remove_keyboard(update: Update, _):
+    log_update(update, logger)
     update.message.reply_text("Done!", reply_markup=ReplyKeyboardRemove())
 
 

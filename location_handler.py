@@ -9,7 +9,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-from utils import get_coords, args_to_location, COORDS_ERROR
+from utils import get_coords, args_to_location, log_update, valid_coords
 from predictor import execute_prediction
 
 logger = logging.getLogger(__name__)
@@ -20,6 +20,7 @@ LOCATION_KEYBOARD = ["Choose on map", "Send via text"]
 
 
 def find(update: Update, context: CallbackContext) -> int:
+    log_update(update, logger)
     if len(context.args) == 0:
         text = "\n\n".join(
             [
@@ -43,6 +44,7 @@ def find(update: Update, context: CallbackContext) -> int:
 
 
 def location(update: Update, _) -> int:
+    log_update(update, logger)
     user_location = update.message.location
     user_text = update.message.text
 
@@ -60,31 +62,15 @@ def location(update: Update, _) -> int:
         return LOCATION
 
 
-def valid_coords(coords, update):
-    get_out_text = "Type `stop` at any time to get out."
-
-    if coords == COORDS_ERROR["NOT_FOUND"]:
-        update.message.reply_markdown(
-            f"😖 Could not find {update.message.text}. Try with something else!\n\n{get_out_text}"
-        )
-        return False
-
-    if coords == COORDS_ERROR["OOB"]:
-        update.message.reply_markdown(
-            f"I'm sorry, I can only look up places in Germany 🥨 try again!\n\n{get_out_text}"
-        )
-        return False
-
-    return True
-
-
 def stop(update: Update, _) -> int:
+    log_update(update, logger)
     update.message.reply_text("Alright, till next time! 👋")
 
     return ConversationHandler.END
 
 
 def fallback(update: Update, _) -> int:
+    log_update(update, logger)
     update.message.reply_text("I didn't get that. Try again 👉 /find")
 
     return ConversationHandler.END

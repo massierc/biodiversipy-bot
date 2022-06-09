@@ -4,9 +4,12 @@ import re
 import requests
 
 from bs4 import BeautifulSoup
+from logging import Logger
 from geopy.geocoders import Nominatim
 from google.cloud import bigquery
 from typing import Tuple
+
+from telegram import Update
 
 logger = logging.getLogger(__name__)
 
@@ -102,3 +105,33 @@ def get_species_img(scientific_name):
 
 
 print(get_species_img("Glechoma hederacea"))
+
+
+def log_update(update: Update, logger: Logger = logger):
+    message = update.message
+    first_name = message.chat.first_name or ""
+    last_name = message.chat.last_name or ""
+    username = message.chat.username
+    full_name = first_name + last_name
+    form_full_name = f" [{full_name}]" if full_name else ""
+    entry = f"::update:: @{username}{form_full_name} - {message.text}"
+
+    logger.info(entry)
+
+
+def valid_coords(coords, update):
+    get_out_text = "Type `stop` at any time to get out."
+
+    if coords == COORDS_ERROR["NOT_FOUND"]:
+        update.message.reply_markdown(
+            f"😖 Could not find {update.message.text}. Try with something else!\n\n{get_out_text}"
+        )
+        return False
+
+    if coords == COORDS_ERROR["OOB"]:
+        update.message.reply_markdown(
+            f"I'm sorry, I can only look up places in Germany 🥨 try again!\n\n{get_out_text}"
+        )
+        return False
+
+    return True
