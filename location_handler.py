@@ -23,8 +23,8 @@ def find(update: Update, context: CallbackContext) -> int:
     if len(context.args) == 0:
         text = "\n\n".join(
             [
-                "Where should I look?",
-                "You can send me a location 📍 or type an address ✍️",
+                "Send me a location 📍",
+                "Or just type an address ✍️",
             ]
         )
         update.message.reply_text(text)
@@ -34,36 +34,10 @@ def find(update: Update, context: CallbackContext) -> int:
         raw_location = args_to_location(context.args)
         coords = get_coords(raw_location, update)
 
-        if coords == COORDS_ERROR["NOT_FOUND"]:
-            update.message.reply_text(
-                f"😖 Could not find {update.message.text}. Try with something else!"
-            )
-            return LOCATION
-
-        if coords == COORDS_ERROR["OOB"]:
-            update.message.reply_text(
-                "I'm sorry, I can only look up places in Germany 🥨 try again!"
-            )
         if valid_coords(coords, update):
             return execute_prediction(coords, update)
         else:
             return LOCATION
-
-
-def valid_coords(coords, update):
-    if coords == COORDS_ERROR["NOT_FOUND"]:
-        update.message.reply_text(
-            f"😖 Could not find {update.message.text}. Try with something else!"
-        )
-        return False
-
-    if coords == COORDS_ERROR["OOB"]:
-        update.message.reply_text(
-            "I'm sorry, I can only look up places in Germany 🥨 try again!"
-        )
-        return False
-
-    return True
 
 
 def location(update: Update, _) -> int:
@@ -76,10 +50,29 @@ def location(update: Update, _) -> int:
         return LOCATION
 
     coords = get_coords(user_location or user_text)
+
     if valid_coords(coords, update):
         return execute_prediction(coords, update)
     else:
         return LOCATION
+
+
+def valid_coords(coords, update):
+    get_out_text = "Type `stop` at any time to get out."
+
+    if coords == COORDS_ERROR["NOT_FOUND"]:
+        update.message.reply_markdown(
+            f"😖 Could not find {update.message.text}. Try with something else!\n\n{get_out_text}"
+        )
+        return False
+
+    if coords == COORDS_ERROR["OOB"]:
+        update.message.reply_markdown(
+            f"I'm sorry, I can only look up places in Germany 🥨 try again!\n\n{get_out_text}"
+        )
+        return False
+
+    return True
 
 
 def stop(update: Update, _) -> int:

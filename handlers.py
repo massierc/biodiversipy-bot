@@ -82,7 +82,7 @@ command_handlers = [
 ]
 
 message_handlers = [
-    ("sup", sup, Filters.regex(f"^(?i)(yo|sup|hey|hi)$")),
+    ("sup", sup, Filters.regex(f"^(?i)(yo|sup|hey|hi|hello|what's up|what up).*$")),
     ("unknown", unknown, Filters.text & (~Filters.command)),
 ]
 
