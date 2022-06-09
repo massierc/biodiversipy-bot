@@ -1,6 +1,6 @@
 import logging
 
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Update
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
@@ -15,75 +15,51 @@ from predictor import execute_prediction
 logger = logging.getLogger(__name__)
 
 
-LOCATION_PROMPT, LOCATION_FROM_MAP, LOCATION_FROM_TEXT = range(3)
+LOCATION = range(1)
 LOCATION_KEYBOARD = ["Choose on map", "Send via text"]
 
 
 def find(update: Update, context: CallbackContext) -> int:
     if len(context.args) == 0:
-        update.message.reply_markdown(
-            "Where should I look?",
-            reply_markup=ReplyKeyboardMarkup(
-                [LOCATION_KEYBOARD],
-                one_time_keyboard=True,
-            ),
+        text = "\n\n".join(
+            [
+                "Where should I look?",
+                "You can send me a location 📍 or type an address ✍️",
+            ]
         )
+        update.message.reply_text(text)
 
-        return LOCATION_PROMPT
+        return LOCATION
     else:
         raw_location = args_to_location(context.args)
         coords = get_coords(raw_location, update)
         return execute_prediction(coords, update)
 
 
-def location_prompt(update: Update, _) -> int:
-    if update.message.text == LOCATION_KEYBOARD[0]:
-        update.message.reply_text("Plese send me a location 📍")
-
-        return LOCATION_FROM_MAP
-    elif update.message.text == LOCATION_KEYBOARD[1]:
-        update.message.reply_text("Which location?")
-
-        return LOCATION_FROM_TEXT
-    else:
-        update.message.reply_text(
-            "Sorry I didn't get that.", reply_markup=ReplyKeyboardRemove()
-        )
-
-    return ConversationHandler.END
-
-
-def map_location(update: Update, _):
+def location(update: Update, _) -> int:
     user_location = update.message.location
+    user_text = update.message.text
 
     if user_location:
         coords = (user_location.latitude, user_location.longitude)
         return execute_prediction(coords, update)
+    elif user_text:
+        coords = get_coords(user_text, update)
+        return execute_prediction(coords, update)
     else:
-        update.message.reply_text(
-            "I didn't get that. Please send me a valid location 📍"
-        )
-        return LOCATION_FROM_MAP
+        update.message.reply_text("Sorry I didn't get that. Try again")
 
-
-def text_location(update: Update, _):
-    location = update.message.text
-    coords = get_coords(location, update)
-    return execute_prediction(coords, update)
+        return LOCATION
 
 
 def stop(update: Update, _) -> int:
-    update.message.reply_text(
-        "Alright, till next time! 👋", reply_markup=ReplyKeyboardRemove()
-    )
+    update.message.reply_text("Alright, till next time! 👋")
 
     return ConversationHandler.END
 
 
 def fallback(update: Update, _) -> int:
-    update.message.reply_text(
-        "I didn't get that. Try again 👉 /find", reply_markup=ReplyKeyboardRemove()
-    )
+    update.message.reply_text("I didn't get that. Try again 👉 /find")
 
     return ConversationHandler.END
 
@@ -91,22 +67,12 @@ def fallback(update: Update, _) -> int:
 location_handler = ConversationHandler(
     entry_points=[CommandHandler("find", find)],
     states={
-        LOCATION_PROMPT: [
+        LOCATION: [
             MessageHandler(
-                Filters.regex(f"^({LOCATION_KEYBOARD[0]}|{LOCATION_KEYBOARD[1]})$"),
-                location_prompt,
-            )
-        ],
-        LOCATION_FROM_MAP: [
-            MessageHandler(
-                (Filters.location | Filters.text) & (~Filters.regex(f"^(?i)stop$")),
-                map_location,
-            )
-        ],
-        LOCATION_FROM_TEXT: [
-            MessageHandler(
-                Filters.text & (~Filters.command),
-                text_location,
+                (Filters.location | Filters.text)
+                & (~Filters.regex(f"^(?i)stop$"))
+                & (~Filters.command),
+                location,
             )
         ],
     },

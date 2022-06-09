@@ -6,7 +6,7 @@ from google.cloud import bigquery
 from utils import get_features
 
 from telegram.ext import ConversationHandler
-from telegram import Update, ReplyKeyboardRemove
+from telegram import Update
 
 
 logger = logging.getLogger(__name__)
@@ -59,6 +59,6 @@ def execute_prediction(coords: str, update: Update) -> int:
     except Exception as e:
         logger.error(e)
         message.edit_text(
-            "An error occurred during the prediction, please try again.",
+            "An error occurred during the prediction, please try again 👉 /find",
         )
         return ConversationHandler.END
