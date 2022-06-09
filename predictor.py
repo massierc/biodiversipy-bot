@@ -33,16 +33,16 @@ def execute_prediction(coords: str, update: Update) -> int:
     message = update.message.reply_text("Got it! Just a minute ⌛")
 
     try:
-        # predictor = Predictor(coords)
-        # predictions = predictor.predict()
+        predictor = Predictor(coords)
+        predictions = predictor.predict()
 
-        predictions = [
-            {"species": "Chelidonium majus"},
-            {"species": "Hedera helix"},
-            {"species": "Echium vulgare"},
-            {"species": "Bellis perennis"},
-            {"species": "Glechoma hederacea"},
-        ]
+        # predictions = [
+        #     {"species": "Chelidonium majus"},
+        #     {"species": "Hedera helix"},
+        #     {"species": "Echium vulgare"},
+        #     {"species": "Bellis perennis"},
+        #     {"species": "Glechoma hederacea"},
+        # ]
 
         species = [prediction["species"] for prediction in predictions]
 
