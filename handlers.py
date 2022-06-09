@@ -1,10 +1,7 @@
-import html
-import json
 import logging
-import traceback
-import os
+import random
 
-from telegram import Update, ParseMode
+from telegram import Update
 from telegram.ext import (
     CallbackContext,
     CommandHandler,
@@ -51,6 +48,18 @@ def bad_command(_: Update, context: CallbackContext):
     context.bot.wrong_method_name()
 
 
+def sup(update: Update, _):
+    replies = [
+        "Molto bene 🤌",
+        "Peace ✌️",
+        "Life is good 🙌",
+        "Hi 👋",
+        "Bring it on 💪",
+        "Yo 🤙",
+    ]
+    update.message.reply_text(random.choice(replies))
+
+
 def unknown(update: Update, _):
     text = "\n\n".join(
         ["Sorry, I didn't get it. I'm a simple bot 🙈", "Check my commands below 👇"]
@@ -72,7 +81,10 @@ command_handlers = [
     ("kaboom", bad_command),
 ]
 
-message_handlers = [("unknown", unknown, Filters.text & (~Filters.command))]
+message_handlers = [
+    ("sup", sup, Filters.regex(f"^(?i)(yo|sup|hey|hi)$")),
+    ("unknown", unknown, Filters.text & (~Filters.command)),
+]
 
 
 def register_handlers(dispatcher: Dispatcher):
@@ -82,6 +94,6 @@ def register_handlers(dispatcher: Dispatcher):
     dispatcher.add_handler(location_handler)
 
     for (id, fn, filters) in message_handlers:
-        dispatcher.add_handler(MessageHandler(filters, unknown))
+        dispatcher.add_handler(MessageHandler(filters, fn))
 
     dispatcher.add_error_handler(error_handler)
