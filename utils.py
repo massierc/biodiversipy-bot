@@ -1,6 +1,9 @@
 import logging
 import pandas as pd
+import re
+import requests
 
+from bs4 import BeautifulSoup
 from geopy.geocoders import Nominatim
 from google.cloud import bigquery
 from typing import Tuple
@@ -76,3 +79,27 @@ def get_features(coords: Tuple[float, float], client: bigquery.Client):
 
 def args_to_location(args):
     return " ".join([arg.capitalize() for arg in args])
+
+
+def get_species_description(scientific_name):
+    query = scientific_name.replace(" ", "_")
+    html = requests.get(f"https://en.wikipedia.org/wiki/{query}")
+    soup = BeautifulSoup(html.text, "html.parser")
+    string = " ".join(soup.select("p")[1].find_all(text=True)).strip("\n")
+    description = re.sub("\[\d+\]", "", string)
+
+    return description
+
+
+def get_plant_img(scientific_name):
+    params = {
+        "q": scientific_name,
+        "tbm": "isch",
+        "content-type": "image/jpeg",
+        "size": "large",
+    }
+    html = requests.get("https://www.google.com/search", params=params)
+    soup = BeautifulSoup(html.text, "html.parser")
+    url = soup.select("img")[2]["src"]
+
+    return url
