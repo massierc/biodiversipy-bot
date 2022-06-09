@@ -9,7 +9,7 @@ from telegram.ext import (
     ConversationHandler,
 )
 
-from utils import get_coords, args_to_location
+from utils import get_coords, args_to_location, COORDS_ERROR
 from predictor import execute_prediction
 
 logger = logging.getLogger(__name__)
@@ -33,22 +33,52 @@ def find(update: Update, context: CallbackContext) -> int:
     else:
         raw_location = args_to_location(context.args)
         coords = get_coords(raw_location, update)
-        return execute_prediction(coords, update)
+
+        if coords == COORDS_ERROR["NOT_FOUND"]:
+            update.message.reply_text(
+                f"😖 Could not find {update.message.text}. Try with something else!"
+            )
+            return LOCATION
+
+        if coords == COORDS_ERROR["OOB"]:
+            update.message.reply_text(
+                "I'm sorry, I can only look up places in Germany 🥨 try again!"
+            )
+        if valid_coords(coords, update):
+            return execute_prediction(coords, update)
+        else:
+            return LOCATION
+
+
+def valid_coords(coords, update):
+    if coords == COORDS_ERROR["NOT_FOUND"]:
+        update.message.reply_text(
+            f"😖 Could not find {update.message.text}. Try with something else!"
+        )
+        return False
+
+    if coords == COORDS_ERROR["OOB"]:
+        update.message.reply_text(
+            "I'm sorry, I can only look up places in Germany 🥨 try again!"
+        )
+        return False
+
+    return True
 
 
 def location(update: Update, _) -> int:
     user_location = update.message.location
     user_text = update.message.text
 
-    if user_location:
-        coords = (user_location.latitude, user_location.longitude)
-        return execute_prediction(coords, update)
-    elif user_text:
-        coords = get_coords(user_text, update)
-        return execute_prediction(coords, update)
-    else:
+    if not user_location and not user_text:
         update.message.reply_text("Sorry I didn't get that. Try again")
 
+        return LOCATION
+
+    coords = get_coords(user_location or user_text)
+    if valid_coords(coords, update):
+        return execute_prediction(coords, update)
+    else:
         return LOCATION
 
 

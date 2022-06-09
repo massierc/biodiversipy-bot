@@ -22,17 +22,30 @@ def build_query(table, coords):
         """
 
 
-def get_coords(raw_location, update=None):
+COORDS_ERROR = {
+    "NOT_FOUND": "NOT_FOUND",
+    "OOB": "OOB",
+}
+
+
+def get_coords(raw_location):
+    if not isinstance(raw_location, str):
+        return (raw_location.latitude, raw_location.longitude)
+
     logger.info(f"Looking for coordinates for {raw_location}")
 
     geolocator = Nominatim(user_agent="biodiversipy_bot")
-    location = geolocator.geocode(raw_location)
+    location = geolocator.geocode(raw_location, language="en")
 
     if not location:
-        return None
+        return COORDS_ERROR["NOT_FOUND"]
 
     coords = (location.latitude, location.longitude)
     address = location.address
+    country = address.replace(" ", "").split(",")[-1]
+
+    if not country == "Germany":
+        return COORDS_ERROR["OOB"]
 
     logger.info(f"ADDRESS: {address} - LAT, LON: {coords}")
 
