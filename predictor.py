@@ -5,7 +5,6 @@ import requests
 from google.cloud import bigquery
 from utils import get_features, get_species_img, get_species_description
 
-from telegram.ext import ConversationHandler
 from telegram import Update
 
 
@@ -46,32 +45,25 @@ def execute_prediction(coords: str, update: Update) -> int:
 
         species = [prediction["species"] for prediction in predictions]
 
-        most_likely = species[0]
-        other_species = "\n".join(
-            [f"{i + 2}. {sp}" for i, sp in enumerate(species[1:])]
-        )
-
         message.edit_text(f"Good news, I found some plants! 🌱")
         update.message.reply_html(
             f"The plant you will most likely find here is <b>{species[0]}</b>:"
         )
 
-        img = get_species_img(most_likely)
+        img = get_species_img(species[0])
         if img:
             update.message.reply_photo(img)
 
-        desc = get_species_description(most_likely)
+        desc = get_species_description(species[0])
         if desc:
             update.message.reply_html(f"<i>{desc}</i>")
 
         update.message.reply_text(
-            f"\n\nThe next most likely plants here are:\n\n{other_species}"
+            f"\n\Other plants you are likely to encounter:\n\n{'\n'.join(species[1:])}"
         )
 
-        return ConversationHandler.END
     except Exception as e:
         logger.error(e)
         message.edit_text(
             "An error occurred during the prediction, please try again 👉 /find",
         )
-        return ConversationHandler.END

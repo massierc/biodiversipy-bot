@@ -36,7 +36,8 @@ def find(update: Update, context: CallbackContext) -> int:
         coords = get_coords(raw_location, update)
 
         if valid_coords(coords, update):
-            return execute_prediction(coords, update)
+            execute_prediction(coords, update)
+            return ConversationHandler.END
         else:
             return LOCATION
 
@@ -53,7 +54,8 @@ def location(update: Update, _) -> int:
     coords = get_coords(user_location or user_text)
 
     if valid_coords(coords, update):
-        return execute_prediction(coords, update)
+        execute_prediction(coords, update)
+        return ConversationHandler.END
     else:
         return LOCATION
 
