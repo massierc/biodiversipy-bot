@@ -105,16 +105,18 @@ def get_species_img(scientific_name):
 
 
 def log_update(update: Update, logger: Logger = logger):
-    message = update.message
-    first_name = message.chat.first_name or ""
-    last_name = message.chat.last_name or ""
-    username = message.chat.username
-    full_name = first_name + last_name
-    form_username = f"@{username}" if username else ""
-    form_full_name = f"[{full_name}]" if full_name else ""
-    entry = f"::update:: {form_username}{form_full_name} - {message.text}"
-
-    logger.info(entry)
+    try:
+        message = update.message
+        first_name = message.chat.first_name or ""
+        last_name = message.chat.last_name or ""
+        username = message.chat.username
+        full_name = first_name + last_name
+        form_username = f"@{username}" if username else ""
+        form_full_name = f"[{full_name}]" if full_name else ""
+        entry = f"::update:: {form_username}{form_full_name} - {message.text}"
+        logger.info(entry)
+    except Exception as e:
+        logger.error(f"An error occurred on log_update: {e}")
 
 
 def valid_coords(coords, update):
