@@ -1,4 +1,6 @@
 import logging
+import time
+
 
 from telegram import Update
 from telegram.ext import (
@@ -48,6 +50,9 @@ def location(update: Update, _) -> int:
     user_location = update.message.location
     user_text = update.message.text
 
+    if user_text and user_text.lower() == "lewagon berlin":
+        return lewagon(update)
+
     if not user_location and not user_text:
         update.message.reply_text("Sorry I didn't get that. Try again")
 
@@ -60,6 +65,21 @@ def location(update: Update, _) -> int:
         return ConversationHandler.END
     else:
         return LOCATION
+
+
+def lewagon(update: Update):
+    message = update.message.reply_text("Got it! Just a minute ⌛")
+    time.sleep(3)
+    message.edit_text(f"Good news, I found some plants! 🌱")
+
+    update.message.reply_html(
+        f"The plant you will most likely find here is <b>Mikkelius Wagonius</b>:"
+    )
+    update.message.reply_photo(open("assets/mikkelus-wagonius.JPG", "rb"))
+    update.message.reply_html(
+        "<i>The Mikkelus Wagonius VK, most commonly known as the 'Viking climbing 7s', is an aggressive seasonal plant native to Danish villages. Via 9-euro-ticket and 30 cent gas discount it has been introduced to Berlin, and is largely considered an invasive species, particularly on volleyball courts. Uprooting or cutting the plant is an effective means of control.</i>"
+    )
+    return ConversationHandler.END
 
 
 def stop(update: Update, _) -> int:
@@ -75,6 +95,8 @@ def fallback(update: Update, _) -> int:
 
     return ConversationHandler.END
 
+
+LEWAGON_FILTER = Filters.regex(f"^(?i)lewagon berlin$")
 
 location_handler = ConversationHandler(
     entry_points=[CommandHandler("find", find)],
