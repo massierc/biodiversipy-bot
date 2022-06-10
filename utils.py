@@ -127,17 +127,15 @@ def log_update(update: Update, logger: Logger = logger):
 
 
 def valid_coords(coords, update):
-    get_out_text = "Type `stop` at any time to get out."
-
     if coords == COORDS_ERROR["NOT_FOUND"]:
         update.message.reply_markdown(
-            f"😖 Could not find {update.message.text}. Try with something else!\n\n{get_out_text}"
+            f"😖 Could not find {update.message.text}. Try with something else!"
         )
         return False
 
     if coords == COORDS_ERROR["OOB"]:
         update.message.reply_markdown(
-            f"I'm sorry, I can only look up places in Germany 🥨 try again!\n\n{get_out_text}"
+            f"I'm sorry, I can only look up places in Germany 🥨 try again!"
         )
         return False
 
