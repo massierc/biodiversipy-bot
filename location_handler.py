@@ -34,7 +34,7 @@ def find(update: Update, context: CallbackContext) -> int:
         return LOCATION
     else:
         raw_location = args_to_location(context.args)
-        coords = get_coords(raw_location, update)
+        coords = get_coords(raw_location)
 
         if valid_coords(coords, update):
             execute_prediction(coords, update)
