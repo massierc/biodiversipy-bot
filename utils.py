@@ -104,17 +104,15 @@ def get_species_img(scientific_name):
     return full_url
 
 
-print(get_species_img("Glechoma hederacea"))
-
-
 def log_update(update: Update, logger: Logger = logger):
     message = update.message
     first_name = message.chat.first_name or ""
     last_name = message.chat.last_name or ""
     username = message.chat.username
     full_name = first_name + last_name
-    form_full_name = f" [{full_name}]" if full_name else ""
-    entry = f"::update:: @{username}{form_full_name} - {message.text}"
+    form_username = f"@{username}" if username else ""
+    form_full_name = f"[{full_name}]" if full_name else ""
+    entry = f"::update:: {form_username}{form_full_name} - {message.text}"
 
     logger.info(entry)
 
