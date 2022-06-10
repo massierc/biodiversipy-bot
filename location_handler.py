@@ -19,17 +19,19 @@ logger = logging.getLogger(__name__)
 
 LOCATION = range(1)
 LOCATION_KEYBOARD = ["Choose on map", "Send via text"]
+INSTRUCTIONS_MARKDOWN = "\n".join(
+    [
+        "`📍  `You can share your location from the menu button (📎) below",
+        "`✍️  `Or you can just type an address",
+    ]
+)
 
 
 def find(update: Update, context: CallbackContext) -> int:
     log_update(update, logger)
     if len(context.args) == 0:
         text = "\n\n".join(
-            [
-                "Alright let's go! You have two options:",
-                "`📍  `You can share your location from the menu button (📎) below",
-                "`✍️  `Or you can just type an address",
-            ]
+            ["Alright let's go! You have two options:", INSTRUCTIONS_MARKDOWN]
         )
         update.message.reply_markdown(text)
 
@@ -91,9 +93,9 @@ def stop(update: Update, _) -> int:
 
 def fallback(update: Update, _) -> int:
     log_update(update, logger)
-    update.message.reply_text("I didn't get that. Try again 👉 /find")
+    update.message.reply_markdown(f"I didn't get that 🙈\n\n{INSTRUCTIONS_MARKDOWN}")
 
-    return ConversationHandler.END
+    return LOCATION
 
 
 LEWAGON_FILTER = Filters.regex(f"^(?i)lewagon berlin$")
