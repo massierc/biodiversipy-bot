@@ -19,7 +19,7 @@ COORD_COLUMNS = ["lon_lower", "lon_upper", "lat_lower", "lat_upper"]
 
 def build_query(table, coords):
     lat, lon = coords
-    print(f"Build query on {table} for lat={coords[0]}, lon={coords[1]}")
+    logger.info(f"Build query on {table} for lat={coords[0]}, lon={coords[1]}")
 
     return f"""
         SELECT *

@@ -50,7 +50,7 @@ def location(update: Update, _) -> int:
     user_location = update.message.location
     user_text = update.message.text
 
-    if user_text and user_text.lower() == "lewagon berlin":
+    if user_text and user_text.lower() in ["lewagon berlin", "le wagon berlin"]:
         return lewagon(update)
 
     if not user_location and not user_text:
