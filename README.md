@@ -2,10 +2,12 @@
 
 [biodiversipy](https://github.com/TmtStss/biodiversipy)'s Telegram bot.
 
+## Run your own instance
+
 Create a gcloud function:
 
 ```sh
-gcloud functions deploy biodiversipy_bot --set-env-vars "TELEGRAM_TOKEN=<TELEGRAM_TOKEN>" --runtime python38 --trigger-http --project=le-wagon-bootcamp-346910 --region=<region>
+gcloud functions deploy <bot_name> --set-env-vars "TELEGRAM_TOKEN=<TELEGRAM_TOKEN>" --runtime python38 --trigger-http --project=<gcloud_project_id> --region=<region>
 ```
 
 Set up webhook:
