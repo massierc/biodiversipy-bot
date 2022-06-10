@@ -84,24 +84,24 @@ def args_to_location(args):
     return " ".join([arg.capitalize() for arg in args])
 
 
-def get_species_description(scientific_name):
+def get_species_info(scientific_name):
     query = scientific_name.replace(" ", "_")
     html = requests.get(f"https://en.wikipedia.org/wiki/{query}")
     soup = BeautifulSoup(html.text, "html.parser")
-    raw_text = "".join(soup.select("p")[1].find_all(text=True))
-    text = re.sub("\[\d+\]", "", raw_text)
 
-    return text
+    not_found = soup.select(".noarticletext")
 
+    if not_found:
+        logger.warn(f"Wikipedia article not found for {scientific_name}")
+        return None
 
-def get_species_img(scientific_name):
-    query = scientific_name.replace(" ", "_")
-    html = requests.get(f"https://en.wikipedia.org/wiki/{query}")
-    soup = BeautifulSoup(html.text, "html.parser")
-    url_bit = soup.select("img")[0].get("srcset").split(",")[1][:-2].strip()
-    full_url = "https:" + url_bit
+    img_url = soup.select("img")[0].get("srcset").split(",")[1][:-2].strip()
+    img_url = "https:" + img_url
 
-    return full_url
+    raw_desc = "".join(soup.select("p")[1].find_all(text=True))
+    description = re.sub("\[\d+\]", "", raw_desc)
+
+    return img_url, description
 
 
 def log_update(update: Update, logger: Logger = logger):

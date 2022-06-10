@@ -3,7 +3,7 @@ import os
 import requests
 
 from google.cloud import bigquery
-from utils import get_features, get_species_img, get_species_description
+from utils import get_features, get_species_info
 
 from telegram import Update
 
@@ -50,11 +50,10 @@ def execute_prediction(coords: str, update: Update) -> int:
             f"The plant you will most likely find here is <b>{species[0]}</b>:"
         )
 
-        img = get_species_img(species[0])
+        img, desc = get_species_info(species[0])
         if img:
             update.message.reply_photo(img)
 
-        desc = get_species_description(species[0])
         if desc:
             update.message.reply_html(f"<i>{desc}</i>")
 
