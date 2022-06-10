@@ -50,12 +50,16 @@ def execute_prediction(coords: str, update: Update) -> int:
             f"The plant you will most likely find here is <b>{species[0]}</b>:"
         )
 
-        img, desc = get_species_info(species[0])
-        if img:
-            update.message.reply_photo(img)
+        img, desc, article_url = get_species_info(species[0])
+        logger.info(f"Found wiki {article_url}")
+        try:
+            if img:
+                update.message.reply_photo(img)
 
-        if desc:
-            update.message.reply_html(f"<i>{desc}</i>")
+            if desc:
+                update.message.reply_html(f"<i>{desc}</i>")
+        except Exception as e:
+            logger.error(e)
 
         text = "\n\n".join(
             [f"Other plants you are likely to encounter:", "\n".join(species[1:])]
